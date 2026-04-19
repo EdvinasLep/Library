@@ -14,7 +14,9 @@
 # Ruby
 *.log
 *.sqlite3
-
+library.sqlite3
+library.sqlite3-shm
+library.sqlite3-wal
 # Bundler
 /vendor/bundle
 
