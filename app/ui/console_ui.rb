@@ -59,7 +59,7 @@ class ConsoleUi
 
   def show_books(books)
     puts
-    
+
     if books.empty?
       puts "No books are currently available."
       return
@@ -67,6 +67,13 @@ class ConsoleUi
 
     books.each do |book|
       puts "#{book.id} #{book.book_name} #{book.author} #{book.release_year}"
+    end
+  end
+
+  def show_borrowed_books(borrowed_books)
+    puts
+    borrowed_books.each do |borrowed_book|
+      puts "#{borrowed_book.book.id} #{borrowed_book.book.book_name} #{borrowed_book.book.author} #{borrowed_book.book.release_year} Borrowed on: #{borrowed_book.borrowed_on} Borrowed for: #{borrowed_book.borrowed_for} days"
     end
   end
 end

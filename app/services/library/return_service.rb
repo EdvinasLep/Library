@@ -17,5 +17,12 @@ module Library
       record.destroy!
       book
     end
+
+    def borrowed_books(user:)
+      borrowed_books = BorrowedBook.where(user_id: user.id)
+      raise NoBorrowedBooksError, "You have no books borrowed." if borrowed_books.empty?
+
+      borrowed_books
+    end
   end
 end
