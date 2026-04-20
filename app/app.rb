@@ -12,7 +12,7 @@ class App
 
   def run
     @console_ui.welcome
-    return unless login_flow
+    return unless auth_menu
 
     menu_loop
     @console_ui.goodbye
@@ -20,25 +20,44 @@ class App
 
   private
 
-  def login_flow
+  def auth_menu
+    loop do
+      @console_ui.show_auth_menu
+      choice = @console_ui.ask("Choose an option (1-3):")
+
+      case choice
+      when "1"
+        return true if login
+      when "2"
+        return true if register
+      when "3"
+        return false
+      else
+        @console_ui.invalid_auth_choice
+      end
+    end
+  end
+
+  def login
     username = @console_ui.ask("Enter your username:")
-
-    if @library_service.user_exists?(username)
-      @current_user = username.strip
-      @console_ui.welcome_back(@current_user)
-      return true
-    end
-
-    answer = @console_ui.ask("User '#{username}' does not exist. Create an account? (y/n):")
-    unless answer.downcase == "y"
-      @console_ui.goodbye
-      return false
-    end
-
-    @library_service.register_user(username)
-    @current_user = username.strip
-    @console_ui.account_created(@current_user)
+    password = @console_ui.ask("Enter your password:")
+    @current_user = @library_service.login(username: username, password: password)
+    @console_ui.login_success(@current_user)
     true
+  rescue InvalidCredentialsError => e
+    @console_ui.error(e.message)
+    false
+  end
+
+  def register
+    username = @console_ui.ask("Choose a username:")
+    password = @console_ui.ask("Choose a password:")
+    @current_user = @library_service.register(username: username, password: password)
+    @console_ui.register_success(@current_user)
+    true
+  rescue UsernameTakenError, InvalidCredentialsError, InvalidPasswordError => e
+    @console_ui.error(e.message)
+    false
   end
 
   def menu_loop
@@ -62,7 +81,7 @@ class App
 
   def borrow_book
     book_id = @console_ui.ask("Enter the book ID to borrow:")
-    book = @library_service.borrow_book(book_id: book_id, username: @current_user)
+    book = @library_service.borrow_book(book_id: book_id, user: @current_user)
     @console_ui.borrow_success(book)
   rescue BookNotAvailableError, BookNotFoundError => e
     @console_ui.error(e.message)
@@ -70,7 +89,7 @@ class App
 
   def return_book
     book_id = @console_ui.ask("Enter the book ID to return:")
-    book = @library_service.return_book(book_id: book_id, username: @current_user)
+    book = @library_service.return_book(book_id: book_id, user: @current_user)
     @console_ui.return_success(book)
   rescue BookNotBorrowedError, BookNotFoundError => e
     @console_ui.error(e.message)

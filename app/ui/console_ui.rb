@@ -14,12 +14,23 @@ class ConsoleUi
     puts "Goodbye!"
   end
 
-  def welcome_back(username)
-    puts "Welcome back, #{username}!"
+  def show_auth_menu
+    puts
+    puts "1. Login"
+    puts "2. Register"
+    puts "3. Exit"
   end
 
-  def account_created(username)
-    puts "Account created. Welcome, #{username}!"
+  def login_success(user)
+    puts "Welcome back, #{user.username}!"
+  end
+
+  def register_success(user)
+    puts "Account created. Welcome, #{user.username}!"
+  end
+
+  def invalid_auth_choice
+    puts "Invalid option. Please choose 1, 2, or 3."
   end
 
   def invalid_menu_choice
@@ -27,11 +38,11 @@ class ConsoleUi
   end
 
   def borrow_success(book)
-    puts "Successfully borrowed '#{book[:name]}'."
+    puts "Successfully borrowed '#{book.book_name}'."
   end
 
   def return_success(book)
-    puts "Thank you for returning '#{book[:name]}'."
+    puts "Thank you for returning '#{book.book_name}'."
   end
 
   def error(message)
@@ -47,13 +58,15 @@ class ConsoleUi
   end
 
   def show_books(books)
+    puts
+    
     if books.empty?
       puts "No books are currently available."
       return
     end
 
     books.each do |book|
-      puts "#{book[:id]} #{book[:name]} #{book[:author]} #{book[:release_year]}"
+      puts "#{book.id} #{book.book_name} #{book.author} #{book.release_year}"
     end
   end
 end
