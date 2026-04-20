@@ -1,11 +1,21 @@
 # frozen_string_literal: true
 
-require_relative "services/library_service"
+require_relative "services/user/auth_service"
+require_relative "services/user/registration_service"
+require_relative "services/library/book_listing_service"
+require_relative "services/library/borrow_service"
+require_relative "services/library/return_service"
 require_relative "ui/console_ui"
 
 class App
-  def initialize(library_service:, console_ui:)
-    @library_service = library_service
+  def initialize(auth_service:, registration_service:,
+                 book_listing_service:, borrow_service:, return_service:,
+                 console_ui:)
+    @auth_service = auth_service
+    @registration_service = registration_service
+    @book_listing_service = book_listing_service
+    @borrow_service = borrow_service
+    @return_service = return_service
     @console_ui = console_ui
     @current_user = nil
   end
@@ -41,10 +51,10 @@ class App
   def login
     username = @console_ui.ask("Enter your username:")
     password = @console_ui.ask("Enter your password:")
-    @current_user = @library_service.login(username: username, password: password)
+    @current_user = @auth_service.login(username: username, password: password)
     @console_ui.login_success(@current_user)
     true
-  rescue InvalidCredentialsError => e
+  rescue Users::InvalidCredentialsError => e
     @console_ui.error(e.message)
     false
   end
@@ -52,10 +62,10 @@ class App
   def register
     username = @console_ui.ask("Choose a username:")
     password = @console_ui.ask("Choose a password:")
-    @current_user = @library_service.register(username: username, password: password)
+    @current_user = @registration_service.register(username: username, password: password)
     @console_ui.register_success(@current_user)
     true
-  rescue UsernameTakenError, InvalidCredentialsError, InvalidPasswordError => e
+  rescue Users::UsernameTakenError, Users::InvalidCredentialsError, Users::InvalidPasswordError => e
     @console_ui.error(e.message)
     false
   end
@@ -76,22 +86,22 @@ class App
   end
 
   def list_books
-    @console_ui.show_books(@library_service.list_available_books)
+    @console_ui.show_books(@book_listing_service.list_available_books)
   end
 
   def borrow_book
     book_id = @console_ui.ask("Enter the book ID to borrow:")
-    book = @library_service.borrow_book(book_id: book_id, user: @current_user)
+    book = @borrow_service.borrow_book(book_id: book_id, user: @current_user)
     @console_ui.borrow_success(book)
-  rescue BookNotAvailableError, BookNotFoundError => e
+  rescue Library::BookNotAvailableError, Library::BookNotFoundError => e
     @console_ui.error(e.message)
   end
 
   def return_book
     book_id = @console_ui.ask("Enter the book ID to return:")
-    book = @library_service.return_book(book_id: book_id, user: @current_user)
+    book = @return_service.return_book(book_id: book_id, user: @current_user)
     @console_ui.return_success(book)
-  rescue BookNotBorrowedError, BookNotFoundError => e
+  rescue Library::BookNotBorrowedError, Library::BookNotFoundError => e
     @console_ui.error(e.message)
   end
 end
