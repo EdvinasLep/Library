@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../services/library/late_fee_calculator"
+
 class ConsoleUi
   def ask(prompt)
     puts prompt
@@ -41,8 +43,16 @@ class ConsoleUi
     puts "Successfully borrowed '#{book.book_name}'."
   end
 
-  def return_success(book)
-    puts "Thank you for returning '#{book.book_name}'."
+  def return_success(outcome)
+    book = outcome.book
+    if outcome.days_late.to_i.positive?
+      fee = format("%.2f", outcome.late_fee)
+      rate = format("%.2f", Library::LateFeeCalculator::FEE_PER_LATE_DAY)
+      puts "Thank you for returning '#{book.book_name}'."
+      puts "This book was #{outcome.days_late} day(s) late. Late fee due: $#{fee} (at $#{rate} per day)."
+    else
+      puts "Thank you for returning '#{book.book_name}'."
+    end
   end
 
   def error(message)

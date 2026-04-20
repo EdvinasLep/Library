@@ -103,8 +103,8 @@ class App
 
     @console_ui.show_borrowed_books(borrowed_books)
     book_id = @console_ui.ask("Enter the book ID to return:")
-    book = @return_service.return_book(book_id: book_id, user: @current_user)
-    @console_ui.return_success(book)
+    outcome = @return_service.return_book(book_id: book_id, user: @current_user)
+    @console_ui.return_success(outcome)
   rescue Library::BookNotBorrowedError, Library::BookNotFoundError, Library::NoBorrowedBooksError => e
     @console_ui.error(e.message)
   end
