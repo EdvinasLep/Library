@@ -5,4 +5,5 @@ module Library
   class BookNotFoundError < Error; end
   class BookNotAvailableError < Error; end
   class BookNotBorrowedError < Error; end
+  class InvalidBorrowDaysError < Error; end
 end

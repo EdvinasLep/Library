@@ -91,9 +91,10 @@ class App
 
   def borrow_book
     book_id = @console_ui.ask("Enter the book ID to borrow:")
-    book = @borrow_service.borrow_book(book_id: book_id, user: @current_user)
+    days_borrowed = @console_ui.ask("Enter how many days you want it to borrow for:")
+    book = @borrow_service.borrow_book(book_id: book_id, user: @current_user, days_borrowed: days_borrowed)
     @console_ui.borrow_success(book)
-  rescue Library::BookNotAvailableError, Library::BookNotFoundError => e
+  rescue Library::BookNotAvailableError, Library::BookNotFoundError, Library::InvalidBorrowDaysError => e
     @console_ui.error(e.message)
   end
 

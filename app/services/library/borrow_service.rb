@@ -7,9 +7,13 @@ require_relative "errors"
 
 module Library
   class BorrowService
-    DEFAULT_BORROW_PERIOD_DAYS = 14
+    MIN_BORROW_PERIOD_DAYS = 1
+    MAX_BORROW_PERIOD_DAYS = 14
 
-    def borrow_book(book_id:, user:)
+    def borrow_book(book_id:, user:, days_borrowed:)
+      days = days_borrowed.to_i
+      raise InvalidBorrowDaysError, "Borrowing period is invalid. It must be between #{MIN_BORROW_PERIOD_DAYS} and #{MAX_BORROW_PERIOD_DAYS} days." if days < MIN_BORROW_PERIOD_DAYS || days > MAX_BORROW_PERIOD_DAYS
+
       id = book_id.to_i
       book = Book.find_by(id: id)
       raise BookNotFoundError, "Book #{id} does not exist." if book.nil?
@@ -19,7 +23,7 @@ module Library
         book_id: id,
         user_id: user.id,
         borrowed_on: Date.today,
-        borrowed_for: DEFAULT_BORROW_PERIOD_DAYS
+        borrowed_for: days
       )
       book
     rescue ActiveRecord::RecordNotUnique
