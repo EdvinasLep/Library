@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :book do
     id { generate(:book_id) }
-    book_name
+    book_name { generate(:book_name) }
     author { generate(:author_name) }
     release_year { 2000 }
   end
